@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+}
+
+group 'com.hhj.lecture'
+version '1.0-SNAPSHOT'
+
+// 设置jdk版本
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    // https://mvnrepository.com/artifact/io.netty/netty-all
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.59.Final'
+
+}
+
+test {
+    useJUnitPlatform()
+}
