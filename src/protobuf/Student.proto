@@ -1,0 +1,23 @@
+//指定语法
+syntax = "proto3";
+
+// 指定package
+package protobuf;
+// 指定javaPackage
+option java_package = "protobuf";
+// 指定javaOuterClassname:生成的外部类的class名称
+option java_outer_classname = "StudentBook";
+
+// 指定message
+message Student{
+  optional int32 id = 1;
+  optional string name = 2;
+  optional int32 age = 3;
+
+
+}
+
+message Book{
+  repeated Student student = 1;
+}
+

@@ -31,6 +31,7 @@ public class TestServer {
                         // Channel创建好会自动调用该方法，相当于一个回调函数
                         protected void initChannel(Channel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
+                            // HttpServerCodec = HttpRequestDecoder + HttpResponseEncoder
                             pipeline.addLast("httpsServerCodec",new HttpServerCodec());
                             pipeline.addLast("testHttpServerHandler",new TestServerHandler());
                         }

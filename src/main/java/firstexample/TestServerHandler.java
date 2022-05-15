@@ -10,13 +10,16 @@ import io.netty.util.CharsetUtil;
 /**
  * @Author virtual
  * @Date 2022/4/24 18:26
- * @description：
+ * @description??
+ * ChannelInboundHandler???????????????????????????????????
+ * ChannelOutboundHandler???????????????????????????????????????
+ * ChannelHandlerContext:
  */
 public class TestServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     @Override
     /**
-     * 该方法用于读取客户端的请求并向客户端作出响应
+     * ?��????????????????????????????????
      */
     protected void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
         if (msg instanceof HttpRequest) {
@@ -24,9 +27,76 @@ public class TestServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, resContent);
             response.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain");
             response.headers().set(HttpHeaderNames.CONTENT_LENGTH, resContent.readableBytes());
-            // 把响应结果返回给客户端
+            // ??????????????????
             ctx.writeAndFlush(response);
         }
+    }
 
+    /**
+     * channel?????????????��???
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelRegistered(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelRegistered");
+        super.channelRegistered(ctx);
+    }
+
+    /**
+     * channel???????????????��???
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelUnregistered");
+        super.channelUnregistered(ctx);
+    }
+
+    /**
+     * channel????????????��???
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelActive");
+        super.channelActive(ctx);
+    }
+
+    /**
+     * channel???????????��???
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelInactive");
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelReadComplete");
+        super.channelReadComplete(ctx);
+    }
+
+    @Override
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
+        System.out.println("userEventTriggered");
+        super.userEventTriggered(ctx, evt);
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelWritabilityChanged");
+        super.channelWritabilityChanged(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        System.out.println("exceptionCaught");
+        super.exceptionCaught(ctx, cause);
     }
 }

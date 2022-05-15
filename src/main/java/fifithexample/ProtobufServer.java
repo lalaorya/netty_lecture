@@ -1,4 +1,4 @@
-package thirdexample;
+package fifithexample;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -7,50 +7,46 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
+import io.netty.handler.codec.protobuf.ProtobufEncoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
+import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.IdleStateHandler;
-
-import java.nio.charset.StandardCharsets;
+import protobuf.StudentBook;
 
 /**
  * @Author virtual
- * @Date 2022/4/25 17:32
- * @description：心跳事件服务器
- * 背景：建立tcp连接后，如果客户端直接断开（飞行模式/关机等），服务器是无法感知到的，因此需要一个心跳机制来保证服务端关闭那些没有心跳（长时间未发信息）的客户端
+ * @Date 2022/4/26 22:13
+ * @description：使用protobuf对象的网络传输
  */
-public class MyHeartbeatEventServer {
-    public static void main(String[] args) throws Exception {
+public class ProtobufServer {
+
+    public static void main(String[] args) throws InterruptedException {
 
         NioEventLoopGroup bossGroup = new NioEventLoopGroup();
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
             ServerBootstrap server = new ServerBootstrap();
-            server.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    // childHandler针对workerGroup的每个channel
+            server.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                     .handler(new LoggingHandler(LogLevel.INFO))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ChannelPipeline pipeline = ch.pipeline();
-                            // 使用netty提供的字符串分割的编解码器
-                            // 添加心跳检查handler(三秒未发送消息视为心跳异常、五秒未响应信息、七秒都有)
-                            pipeline.addLast(new IdleStateHandler(3, 5 , 7))
-                                    .addLast(new MyHeartbeatEventServerHandler());
+                            pipeline.addLast(new ProtobufVarint32FrameDecoder())
+                                    .addLast(new ProtobufDecoder(StudentBook.Book.getDefaultInstance()))
+                                    .addLast(new ProtobufVarint32LengthFieldPrepender())
+                                    .addLast(new ProtobufEncoder())
+                                    .addLast(new ProtobufServerHandler());
                         }
                     });
-            ChannelFuture future = server.bind(8082).sync();
+            ChannelFuture future = server.bind(8085).sync();
             future.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
-
     }
 }
